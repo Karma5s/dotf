@@ -17,11 +17,9 @@
 (setq custom-file "~/.emacs-custom.el")
 (load custom-file)
 
-(defun set-default-font ()
-  (when (member "Iosevka" (font-family-list))
-    (set-frame-font "Iosevka Term 16" t)))
+(set-frame-font "TX-02 12" nil t)
 
-(add-hook 'after-init-hook 'set-default-font)
+
 (setq-default indicate-empty-lines t)
 (fset 'yes-or-no-p 'y-or-n-p)
 
@@ -35,8 +33,12 @@
 (scroll-bar-mode 0)
 (column-number-mode 1)
 (xterm-mouse-mode 1)
+(global-auto-revert-mode 1)
+(savehist-mode 1)
+(recentf-mode 1)
+(global-completion-preview-mode 1)
 
-(global-set-key [down-mouse-3] 'imenu)
+
 (global-set-key (kbd "C-c p") 'find-file-at-point)
 
 (add-hook 'prog-mode-hook
@@ -79,18 +81,49 @@
   (setq use-package-always-ensure t)
   (setq use-package-expand-minimally t))
 
-(use-package smex
-  :ensure t
-  :bind (("M-x" . 'smex)
-         ("M-X" . 'smex-major-mode-commands))
-  :config (smex-initialize))
+(use-package vertico :ensure t :init (vertico-mode))
 
-(use-package ido-completing-read+
+(use-package marginalia :ensure t :init (marginalia-mode))
+
+(use-package consult
+  :ensure t
+  :bind (("C-c C-r" . consult-imenu)
+         ("C-x b" . consult-buffer)))
+
+(use-package orderless
   :ensure t
   :config
-  (ido-mode 1)
-  (ido-everywhere 1)
-  (ido-ubiquitous-mode 1))
+  (setq completion-styles '(orderless basic)))
+
+;; (use-package smex
+;;   :ensure
+;;   :bind (("M-x" . 'smex)
+;;          ("M-X" . 'smex-major-mode-commands))
+;;   :config (smex-initialize))
+
+;; (use-package ido-completing-read+
+;;   :ensure t
+;;   :config
+;;   (ido-mode 1)
+;;   (ido-everywhere 1))
+
+(use-package corfu
+  :config
+  (setq corfu-auto t)
+  (setq corfu-auto-delay 0.2)
+  (setq corfu-auto-prefix 2)
+  (setq tab-always-indent 'complete)
+  (setq corfu-preselect 'prompt)
+  (setq corfu-popupinfo-delay '(1.25 . 0.5))
+  (corfu-popupinfo-mode)
+  (global-corfu-mode))
+
+;; Add extensions
+(use-package cape
+  :init
+  (add-hook 'completion-at-point-functions #'cape-dabbrev)
+  (add-hook 'completion-at-point-functions #'cape-file)
+  (add-hook 'completion-at-point-functions #'cape-elisp-block))
 
 (use-package paredit
   :hook ((emacs-lisp-mode . enable-paredit-mode)
@@ -114,12 +147,12 @@
 (global-set-key (kbd "C-c m s") 'magit-status)
 (global-set-key (kbd "C-c m l") 'magit-log)
 
-(use-package helm
-  :bind (("C-c h" . 'helm-command-prefix)
-         ("C-x b" . 'helm-mini)))
+;; (use-package helm
+;;   :bind (("C-c h" . 'helm-command-prefix)
+;;          ("C-x b" . 'helm-mini)))
 
-(use-package company
-  :config (add-hook 'after-init-hook 'global-company-mode))
+;; (use-package company
+;;   :config (add-hook 'after-init-hook 'global-company-mode))
 
 (use-package yasnippet
   :config (yas-global-mode 1)
