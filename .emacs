@@ -17,7 +17,7 @@
 (setq custom-file "~/.emacs-custom.el")
 (load custom-file)
 
-(set-frame-font "TX-02 12" nil t)
+(set-frame-font "TX-02 11" nil t)
 
 
 (setq-default indicate-empty-lines t)
@@ -31,24 +31,34 @@
 (tool-bar-mode 0)
 (menu-bar-mode 0)
 (scroll-bar-mode 0)
+(blink-cursor-mode -1)
 (column-number-mode 1)
 (xterm-mouse-mode 1)
 (global-auto-revert-mode 1)
 (savehist-mode 1)
 (recentf-mode 1)
 (global-completion-preview-mode 1)
+(global-hl-line-mode 1)
 
+
+;; (setq default-frame-alist
+;;       '((height . 44) (width  . 81) (left-fringe . 0) (right-fringe . 0)
+;;         (internal-border-width . 32) (vertical-scroll-bars . nil)
+;;         (bottom-divider-width . 0) (right-divider-width . 0)
+;;         (undecorated-round . t)))
+;; (modify-frame-parameters nil default-frame-alist)
+;; (setq-default pop-up-windows nil)
 
 (global-set-key (kbd "C-c p") 'find-file-at-point)
 
 (add-hook 'prog-mode-hook
           (lambda ()
             (display-line-numbers-mode 1)
-            (setq display-line-numbers-width-start 1000)
-            (set-face-attribute 'font-lock-keyword-face nil :slant 'italic)
-            (set-face-attribute 'font-lock-type-face nil :slant 'italic)))
+            (setq display-line-numbers-width-start 4)))
 
-(setq visible-bell 0)
+(set-face-attribute 'font-lock-type-face t :slant 'italic)
+(set-face-attribute 'font-lock-keyword-face nil :slant 'italic)
+(setq visible-bell 1)
 (setq display-line-numbers-type 'relative)
 (setq backup-drectory-alist '(("." . "~/.emacs_saves")))
 
@@ -81,14 +91,25 @@
   (setq use-package-always-ensure t)
   (setq use-package-expand-minimally t))
 
-(use-package vertico :ensure t :init (vertico-mode))
+(use-package vertico
+  :ensure t
+  :config
+  (setq vertico-count 6)
+  (setq vertico-resize t)
+  (setq vertico-cycle t)
+  :init
+  (vertico-mode))
 
 (use-package marginalia :ensure t :init (marginalia-mode))
 
 (use-package consult
   :ensure t
   :bind (("C-c C-r" . consult-imenu)
-         ("C-x b" . consult-buffer)))
+         ("C-x b" . consult-buffer)
+         ("M-s g" . consult-grep)
+         ("M-s f" . consult-find)
+         ("M-s o" . consult-outline)
+         ("M-s l" . consult-line)))
 
 (use-package orderless
   :ensure t
@@ -139,13 +160,7 @@
          ("C-\"" . mc/skip-to-next-like-this)
          ("C-:" . mc/skip-to-previous-like-this)))
 
-(rc/require 'cl-lib)
-(rc/require 'magit)
 
-(setq magit-auto-revert-mode nil)
-
-(global-set-key (kbd "C-c m s") 'magit-status)
-(global-set-key (kbd "C-c m l") 'magit-log)
 
 ;; (use-package helm
 ;;   :bind (("C-c h" . 'helm-command-prefix)
@@ -172,7 +187,6 @@
   :config (which-key-mode))
 
 (use-package typescript-mode)
-(use-package cmake-mode)
 (use-package go-mode)
 
 ;; (use-package markdown-mode
@@ -192,8 +206,7 @@
   :init
   (setq rust-mode-treesitter-derive t)
   :hook
-  ((rust-mode . eglot)
-   (rust-mode . company-mode)))
+  ((rust-mode . eglot)))
 
 (use-package eglot
   :hook
@@ -257,20 +270,19 @@
   ;; Convenient alternative to C-i after typing one of the above
   (keymap-set completion-preview-active-mode-map "M-i" #'completion-preview-insert))
 
-;; (use-package challenger-deep-theme)
-;; (use-package gruber-darker-theme)
+(use-package challenger-deep-theme)
+(use-package gruber-darker-theme)
 (use-package material-theme)
-;; (use-package flatland-theme)
-;; (use-package gruvbox-theme)
-;; (use-package modus-themes)
-;; (use-package nord-theme)
-;; (use-package nordless-theme)
-;; (use-package nordic-night-theme)
+
+
+
+
+
 
 
 ;; (load-theme 'challenger-deep t)
 ;; (load-theme 'gruber-darker t)
-(load-theme 'material t)
+;; (load-theme 'material t)
 ;; (load-theme 'flatland t)
 ;; (load-theme 'modus-vivendi-tinted t)
 ;; (load-theme 'modus-vivendi t)
@@ -284,3 +296,32 @@
 (setq mouse-wheel-progressive-speed nil) ;; don't accelerate scrolling
 (setq mouse-wheel-follow-mouse 't) ;; scroll window under mouse
 (setq scroll-step 1) ;; keyboard scroll one line at a time
+
+(use-package nano-theme
+  :config
+  (load-theme 'nano-dark))
+
+(use-package nano-modeline
+  :config
+  (nano-modeline-text-mode t))
+
+(add-hook 'prog-mode-hook            #'nano-modeline-prog-mode)
+(add-hook 'text-mode-hook            #'nano-modeline-text-mode)
+(add-hook 'org-mode-hook             #'nano-modeline-org-mode)
+(add-hook 'pdf-view-mode-hook        #'nano-modeline-pdf-mode)
+(add-hook 'mu4e-headers-mode-hook    #'nano-modeline-mu4e-headers-mode)
+(add-hook 'mu4e-view-mode-hook       #'nano-modeline-mu4e-message-mode)
+(add-hook 'elfeed-show-mode-hook     #'nano-modeline-elfeed-entry-mode)
+(add-hook 'elfeed-search-mode-hook   #'nano-modeline-elfeed-search-mode)
+(add-hook 'term-mode-hook            #'nano-modeline-term-mode)
+(add-hook 'xwidget-webkit-mode-hook  #'nano-modeline-xwidget-mode)
+(add-hook 'messages-buffer-mode-hook #'nano-modeline-message-mode)
+(add-hook 'org-capture-mode-hook     #'nano-modeline-org-capture-mode)
+(add-hook 'org-agenda-mode-hook      #'nano-modeline-org-agenda-mode)
+
+
+(use-package clang-format
+  :commands (clang-format-buffer clang-format-on-save-mode)
+  :hook (c-mode c++-mode)
+  :config
+  (clang-format-on-save-mode))
